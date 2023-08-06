@@ -9,7 +9,7 @@ const P5Canvas = () => {
 
 	useEffect(() => {
 		// get classes from classes txt file and put them in an array
-		fetch('https://doodle-vision.b-cdn.net/classes.txt')
+		fetch('https://doodle-vision.b-cdn.net/class_names.txt')
 			.then((response) => response.text())
 			.then((data) => {
 				classes = data.split('\n');
@@ -64,8 +64,15 @@ const P5Canvas = () => {
 		// make a prediction
 		const prediction = await model.predict(tensorInputs);
 		const results = await prediction.data();
-		const index = results.indexOf(Math.max(...results));
-		console.log(classes[index]);
+		// turn results into array
+		const resultsArray = Array.from(results);
+		// get the index of the 3 highest probabilities
+		resultsArray.sort((a, b) => b - a);
+		const top3 = resultsArray.slice(0, 5);
+		const top3Predictions = top3.map((result) => {
+			return classes[results.indexOf(result)];
+		});
+		console.log(top3Predictions);
 	};
 
 	async function loadModel() {
